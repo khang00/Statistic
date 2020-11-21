@@ -5,19 +5,24 @@ rownames(sexual_harassment) <- c("girls", "boys")
 sexual_harassment <- as.table(sexual_harassment)
 
 # Compute count table
-margin.table(sexual_harassment)
-margin.table(sexual_harassment, 1)
-margin.table(sexual_harassment, 2)
+grandTotalHarass <- margin.table(sexual_harassment)
+rowTotalHarass <- margin.table(sexual_harassment, 1)
+colTotalHarass <- margin.table(sexual_harassment, 2)
+countsHarass <- rbind(as.matrix(sexual_harassment), as.data.frame.table(colTotalHarass)$Freq)
+countsHarass <- cbind(as.matrix(countsHarass), c(as.data.frame.table(rowTotalHarass)$Freq, grandTotalHarass))
+colnames(countsHarass)[4]<-("row totals")
+rownames(countsHarass)[3]<-("column totals")
+countsHarass
 
 # Find the expected count
-XsqSexual <- chisq.test(sexual_harassment)
-XsqSexual$expected
+XsqHarass <- chisq.test(sexual_harassment)
+XsqHarass$expected
 
 # ================================ 9.26 =====================================================
 # the p value is smaller than 0.05, indicate that there is an dependency.
 XsqSexual
 
-# 9.31
+# ================================ 9.31 =====================================================
 dice <- matrix(c(89, 82, 123, 115, 100, 91), ncol = 6, byrow = TRUE)
 colnames(dice) <- c(1, 2, 3, 4, 5, 6)
 rownames(dice) <- "count"
@@ -35,11 +40,17 @@ fraud <- matrix(rbind(c(51, 12, 4), c(6, 5, 1)), ncol = 2, byrow = TRUE)
 colnames(fraud) <- c("numbser allowed", "number not allowed")
 rownames(fraud) <- c("small", "medium", "large")
 fraud <- as.table(fraud)
+fraud
 
 # table of counts
-margin.table(fraud)
-margin.table(fraud, 1)
-margin.table(fraud, 2)
+grandTotalFraud <- margin.table(fraud)
+rowTotalFraud <- margin.table(fraud, 1)
+colTotalFraud <- margin.table(fraud, 2)
+countsFraud <- rbind(as.matrix(fraud), as.data.frame.table(colTotalFraud)$Freq)
+countsFraud <- cbind(as.matrix(countsFraud), c(as.data.frame.table(rowTotalFraud)$Freq, grandTotalFraud))
+colnames(countsFraud)[3]<-("row totals")
+rownames(countsFraud)[4]<-("column totals")
+countsFraud
 
 # percent of claims not allowed
 fraudProp <- prop.table(fraud, 1)
@@ -48,6 +59,7 @@ as.data.frame.matrix(fraudProp)$`number not allowed`
 # combine medium and large, the medium and large have low propotion so we must combine these 2.
 fraud[2,] <- fraud[2,] + fraud[3,]
 fraud <- fraud[-3,]
+fraud
 
 # Ho: there is no dependency between the size of claims and the acceptence of the claims
 # Ha: there is an dependency between the size of claims and the acceptence of the claims
@@ -66,6 +78,7 @@ fund <- matrix(rbind(round(propAccquaintance * numberOfStundent),
 colnames(fund) <- c("parents/family/spouse", "other")
 rownames(fund) <- c("trades", "design", "health", "media/IT", "service", "other")
 fund <- as.table(fund)
+fund
 
 # Ho: There is no association between fields of study and funding source from parents/family/spouse
 # Ha: There is an association between fields of study and funding source from parents/family/spouse
@@ -87,4 +100,4 @@ rownames(horror) <- c("Poltergeist (n 29)", "Jaws (n 23)", "Nightmare on Elm Str
 # the chisq test is not approriate because there is an expected value that is smaller than 5
 horror <- as.table(horror)
 XsqHorror <- chisq.test(horror)
-XsqHorror
+XsqHorror$expected
