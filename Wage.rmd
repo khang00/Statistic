@@ -1,0 +1,63 @@
+---
+title: "R Notebook"
+author: khangdang
+date: 02/12/2020
+output: html_document
+---
+```{r}
+library(readxl)
+wage_data <- read_excel('wage5.xlsx')
+wage_summary <- summary(wage_data)
+wage_sd <- sd(wage_data$wage)
+hours_sd <- sd(wage_data$hours)
+IQ_sd <- sd(wage_data$IQ)
+age_sd <- sd(wage_data$age)
+married_sd <- sd(wage_data$married)
+black_sd <- sd(wage_data$black)
+wage_summary <- rbind(wage_summary, c(
+  paste("Sd Var", toString(round(wage_sd, digits = 3)), sep = " :"),
+  paste("Sd Var", toString(round(hours_sd, digits = 3)), sep = " :"),
+  paste("Sd Var", toString(round(IQ_sd, digits = 3)), sep = " :"),
+  paste("Sd Var", toString(round(age_sd, digits = 3)), sep = " :"),
+  paste("Sd Var", toString(round(married_sd, digits = 3)), sep = " :"),
+  paste("Sd Var", toString(round(black_sd, digits = 3)), sep = " :")))
+wage_summary
+```
+
+```{r}
+hist(wage_data$wage, main = "Histogram of Wage of Individuals",
+     ylab = "Individual",
+     xlab = "Wage",
+     ylim = c(0, 250))
+
+hist(wage_data$hours, main = "Histogram of Weekly Working Hours of Individuals",
+     ylab = "Individual",
+     xlab = "Weekly working hours",
+     ylim = c(0, 600))
+
+hist(wage_data$IQ, main = "Histogram of IQ of Individuals",
+     ylab = "Individual",
+     xlab = "IQ score")
+
+hist(wage_data$age, main = "Histogram of Age of Individuals",
+     ylab = "Individual",
+     xlab = "Age",
+    ylim = c(0, 150))
+```
+
+```{r}
+barplot(table(wage_data$black), xlab = "Color Skin", names.arg = c("Not black", "black"), main = "Black people")
+barplot(table(wage_data$married), xlab = "Marriage Status", names.arg = c("Not Married", "Married"), main = "Married people")
+```
+
+```{r}
+plot(wage_data$wage, wage_data$hours)
+plot(wage_data$wage, wage_data$IQ)
+plot(wage_data$wage, wage_data$age)
+```
+
+```{r}
+cor.test(wage_data$wage, wage_data$hours, method = "pearson")
+cor.test(wage_data$wage, wage_data$IQ, method = "pearson")
+cor.test(wage_data$wage, wage_data$age, method = "pearson")
+```

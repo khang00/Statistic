@@ -1,0 +1,8 @@
+      wage            hours             IQ             age            married          black
+ Min.   : 115.0   Min.   :20.00   Min.   : 50.0   Min.   :28.00    Min.   :0.000   Min.   :0.0000
+ 1st Qu.: 669.0   1st Qu.:40.00   1st Qu.: 92.0   1st Qu.:30.00    1st Qu.:1.000   1st Qu.:0.0000
+ Median : 905.0   Median :40.00   Median :102.0   Median :33.00    Median :1.000   Median :0.0000
+ Mean   : 957.9   Mean   :43.93   Mean   :101.3   Mean   :33.08    Mean   :0.893   Mean   :0.1283
+ 3rd Qu.:1160.0   3rd Qu.:48.00   3rd Qu.:112.0   3rd Qu.:36.00    3rd Qu.:1.000   3rd Qu.:0.0000
+ Max.   :3078.0   Max.   :80.00   Max.   :145.0   Max.   :38.00    Max.   :1.000   Max.   :1.0000
+ Sd Var :404.361  Sd Var :7.224   Sd Var :15.053  Sd Var :3.108    Sd Var :0.309   Sd Var :0.335
