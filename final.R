@@ -84,3 +84,24 @@ pie(table(wage_data$urban),
     main = title_urban)
 
 plot(wage_data$wage, wage_data$urban)
+
+t.test(wage_data$wage, mu = median(wage_data$wage))
+t.test(wage_data$IQ, mu = median(wage_data$IQ))
+t.test(wage_data$KWW, mu = median(wage_data$KWW))
+t.test(wage_data$age, mu = median(wage_data$age))
+
+cor(wage_data$wage, wage_data$IQ)
+cor(wage_data$wage, wage_data$KWW)
+cor(wage_data$wage, wage_data$age)
+
+library(purrr)
+
+numberOfTrainingData <- round(length(wage_data$KWW) * 0.8)
+trainingData <- head(wage_data, numberOfTrainingData)
+testData <- tail(wage_data, length(wage_data$KWW) - numberOfTrainingData)
+
+wage_KWW_model <- lm(wage ~ KWW, data = trainingData)
+summary(wage_KWW_model)
+
+predicted_data <- predict(wage_KWW_model, trainingData)
+(trainingData$wage - predicted_data) %>% keep(function (a) {a == 0})
