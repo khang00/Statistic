@@ -103,8 +103,8 @@ numberOfTrainingData <- round(length(wage_data$KWW) * 0.8)
 trainingData <- head(wage_data, numberOfTrainingData)
 testData <- tail(wage_data, length(wage_data$KWW) - numberOfTrainingData)
 
-wage_KWW_model <- lm(wage ~ KWW, data = trainingData)
-summary(wage_KWW_model)
+wage_model <- lm(wage ~ KWW + IQ, data = trainingData)
+summary(wage_model)
 
-predicted_data <- predict(wage_KWW_model, testData)
+predicted_data <- predict(wage_model, testData)
 (testData$wage - predicted_data) %>% keep(function (a) {a == 0})
