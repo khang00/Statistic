@@ -4,7 +4,26 @@
 # Created on: 12/5/20
 
 library(readxl)
-wage_data <- read_excel('wage5.xlsx')
+wage_data <- read_excel('wage1.xls')
+
+wage_summary <- summary(wage_data)
+wage_sd <- sd(wage_data$wage)
+IQ_sd <- sd(wage_data$IQ)
+KWW_sd <- sd(wage_data$KWW)
+age_sd <- sd(wage_data$age)
+black_sd <- sd(wage_data$black)
+south_sd <- sd(wage_data$south)
+urban_sd <- sd(wage_data$urban)
+
+wage_summary <- rbind(wage_summary, c(
+  paste("Sd Var", toString(round(wage_sd, digits = 3)), sep = " :"),
+  paste("Sd Var", toString(round(IQ_sd, digits = 3)), sep = " :"),
+  paste("Sd Var", toString(round(KWW_sd, digits = 3)), sep = " :"),
+  paste("Sd Var", toString(round(age_sd, digits = 3)), sep = " :"),
+  paste("Sd Var", toString(round(black_sd, digits = 3)), sep = " :"),
+  paste("Sd Var", toString(round(south_sd, digits = 3)), sep = " :"),
+  paste("Sd Var", toString(round(urban_sd, digits = 3)), sep = " :")))
+wage_summary
 
 hist(wage_data$wage, main = "Density histogram of Wage of Individuals",
      ylab = "Proportion",
@@ -12,14 +31,6 @@ hist(wage_data$wage, main = "Density histogram of Wage of Individuals",
      probability = TRUE)
 
 lines(density(wage_data$wage), lwd = 2, col = "red")
-
-hist(wage_data$hours, main = "Density histogram of Weekly Working Hours of Individuals",
-     ylab = "Proportion",
-     xlab = "Weekly working hours",
-     probability = TRUE,
-     ylim = c(0, 0.2))
-
-lines(density(wage_data$hours), lwd = 2, col = "red")
 
 hist(wage_data$IQ, main = "Density histogram of IQ of Individuals",
      ylab = "Proportion",
@@ -29,11 +40,19 @@ hist(wage_data$IQ, main = "Density histogram of IQ of Individuals",
 
 lines(density(wage_data$IQ), lwd = 2, col = "red")
 
+hist(wage_data$KWW, main = "Density histogram of KWW of Individuals",
+     ylab = "Proportion",
+     xlab = "KWW",
+     probability = TRUE,
+     ylim = c(0, 0.06))
+
+lines(density(wage_data$KWW), lwd = 2, col = "red")
+
 hist(wage_data$age, main = "Density histogram of Age of Individuals",
      ylab = "Proportion",
      xlab = "Age",
      probability = TRUE,
-     xlim =c(25, 40))
+     xlim = c(25, 40))
 
 lines(density(wage_data$age), lwd = 2, col = "red")
 
@@ -46,13 +65,22 @@ pie(table(wage_data$black),
     labels = c(not_black_label, black_label),
     main = title_black)
 
+south_propotion <- round(sum(wage_data$south) / length(wage_data$south), 3)
+south_label <- paste("Southerner: ", toString(south_propotion))
+not_south_label <- paste("Not Southerner: ", toString(1 - south_propotion))
+title_south <- paste("Proporion of the Southerner of the sample with n = ", toString(length(wage_data$south)))
 
-married_propotion <- round(sum(wage_data$married / length(wage_data$married)), 3)
-married_label <- paste("Married: ", toString(married_propotion))
-not_married_label <- paste("Not married: ", toString(1 - married_propotion))
-title_married <- paste("Propotion of Married people of the sample with n = ",
-                       toString(length(wage_data$married)))
+pie(table(wage_data$south),
+    labels = c(not_south_label, south_label),
+    main = title_south)
 
-pie(table(wage_data$married),
-    labels = c(not_married_label, married_label),
-    main = title_married)
+urban_propotion <- round(sum(wage_data$urban) / length(wage_data$urban), 3)
+urban_label <- paste("Urban Inhabitant: ", toString(urban_propotion))
+not_urban_label <- paste("Not Urban inhabitant: ", toString(1 - urban_propotion))
+title_urban <- paste("Proporion of Ihe urban inhabitants of the sample with n = ", toString(length(wage_data$urban)))
+
+pie(table(wage_data$urban),
+    labels = c(not_urban_label, urban_label),
+    main = title_urban)
+
+plot(wage_data$wage, wage_data$urban)
