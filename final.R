@@ -93,6 +93,9 @@ t.test(wage_data$age, mu = median(wage_data$age))
 cor(wage_data$wage, wage_data$IQ)
 cor(wage_data$wage, wage_data$KWW)
 cor(wage_data$wage, wage_data$age)
+cor(wage_data$wage, wage_data$black)
+cor(wage_data$wage, wage_data$south)
+cor(wage_data$wage, wage_data$urban)
 
 library(purrr)
 
@@ -103,5 +106,5 @@ testData <- tail(wage_data, length(wage_data$KWW) - numberOfTrainingData)
 wage_KWW_model <- lm(wage ~ KWW, data = trainingData)
 summary(wage_KWW_model)
 
-predicted_data <- predict(wage_KWW_model, trainingData)
-(trainingData$wage - predicted_data) %>% keep(function (a) {a == 0})
+predicted_data <- predict(wage_KWW_model, testData)
+(testData$wage - predicted_data) %>% keep(function (a) {a == 0})
