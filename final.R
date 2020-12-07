@@ -32,6 +32,8 @@ hist(wage_data$wage, main = "Density histogram of Wage of Individuals",
 
 lines(density(wage_data$wage), lwd = 2, col = "red")
 
+boxplot(wage_data$wage)
+
 hist(wage_data$IQ, main = "Density histogram of IQ of Individuals",
      ylab = "Proportion",
      xlab = "IQ score",
@@ -39,6 +41,8 @@ hist(wage_data$IQ, main = "Density histogram of IQ of Individuals",
      ylim = c(0, 0.03))
 
 lines(density(wage_data$IQ), lwd = 2, col = "red")
+
+boxplot(wage_data$IQ)
 
 hist(wage_data$KWW, main = "Density histogram of KWW of Individuals",
      ylab = "Proportion",
@@ -48,6 +52,8 @@ hist(wage_data$KWW, main = "Density histogram of KWW of Individuals",
 
 lines(density(wage_data$KWW), lwd = 2, col = "red")
 
+boxplot(wage_data$KWW)
+
 hist(wage_data$age, main = "Density histogram of Age of Individuals",
      ylab = "Proportion",
      xlab = "Age",
@@ -55,6 +61,8 @@ hist(wage_data$age, main = "Density histogram of Age of Individuals",
      xlim = c(25, 40))
 
 lines(density(wage_data$age), lwd = 2, col = "red")
+
+boxplot(wage_data$age)
 
 black_propotion <- round(sum(wage_data$black) / length(wage_data$black), 3)
 black_label <- paste("Black: ", toString(black_propotion))
@@ -85,26 +93,33 @@ pie(table(wage_data$urban),
 
 plot(wage_data$wage, wage_data$urban)
 
-t.test(wage_data$wage, mu = median(wage_data$wage))
-t.test(wage_data$IQ, mu = median(wage_data$IQ))
-t.test(wage_data$KWW, mu = median(wage_data$KWW))
-t.test(wage_data$age, mu = median(wage_data$age))
+t.test(wage_data$wage, mu = 900)
+t.test(wage_data$IQ, mu = 100)
+t.test(wage_data$KWW, mu = 38)
+t.test(wage_data$age, mu = 32)
 
-cor(wage_data$wage, wage_data$IQ)
-cor(wage_data$wage, wage_data$KWW)
-cor(wage_data$wage, wage_data$age)
-cor(wage_data$wage, wage_data$black)
-cor(wage_data$wage, wage_data$south)
-cor(wage_data$wage, wage_data$urban)
+cor.test(wage_data$wage, wage_data$IQ)
+cor.test(wage_data$wage, wage_data$KWW)
+cor.test(wage_data$wage, wage_data$age)
+
+cor.test(wage_data$wage, wage_data$black)
+cor.test(wage_data$wage, wage_data$south)
+cor.test(wage_data$wage, wage_data$urban)
 
 library(purrr)
 
-numberOfTrainingData <- round(length(wage_data$KWW) * 0.8)
-trainingData <- head(wage_data, numberOfTrainingData)
-testData <- tail(wage_data, length(wage_data$KWW) - numberOfTrainingData)
+training_data <- head(wage_data, round(0.8 * length(wage_data)))
+test_data <- tail(wage_data, length(wage_data) - round(0.8 * length(wage_data)))
 
-wage_model <- lm(wage ~ KWW + IQ, data = trainingData)
+wage_model <- lm(wage ~ KWW + IQ + age, data = wage_data)
 summary(wage_model)
 
-predicted_data <- predict(wage_model, testData)
-(testData$wage - predicted_data) %>% keep(function (a) {a == 0})
+predicted_data <- predict(wage_model, test_data)
+actuals_preds <- data.frame(cbind(actuals = test_data$wage, predicteds = predicted_data))
+
+min_max_accuracy <- mean(apply(actuals_preds, 1, min) / apply(actuals_preds, 1, max))
+
+mape <- mean(abs((actuals_preds$predicteds - actuals_preds$actuals)) / actuals_preds$actuals)
+
+layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page
+plot(fit)
