@@ -108,11 +108,31 @@ cor.test(wage_data$wage, wage_data$urban)
 
 library(purrr)
 
-training_data <- head(wage_data, round(0.8 * length(wage_data)))
-test_data <- tail(wage_data, length(wage_data) - round(0.8 * length(wage_data)))
+training_data <- head(wage_data, round(0.8 * length(wage_data$wage)))
+test_data <- tail(wage_data, length(wage_data) - round(0.8 * length(wage_data$wage)))
 
-wage_model <- lm(wage ~ KWW + IQ + age, data = wage_data)
-summary(wage_model)
+wage_outlier_index <- min(boxplot(wage_data$wage, plot = FALSE)$out)
+iq_outliers <- boxplot(wage_data$IQ, plot = FALSE)$out
+kkw_outlier_index <- max(boxplot(wage_data$KWW, plot = FALSE)$out)
+
+filtered_wage <- wage_data %>%
+  pmap(function(wage, IQ, KWW, age, black, south, urban) {
+    c(wage, IQ, KWW, age, black, south, urban)
+  }) %>%
+  discard(function(row) { row[1] > wage_outlier_index }) %>%
+  discard(function(row) { has_element(iq_outliers, row[2]) }) %>%
+  discard(function(row) { row[3] < kkw_outlier_index })
+
+filtered_wage <- t(as.data.frame(filtered_wage))
+colnames(filtered_wage) <- c("wage", "IQ", "KWW", "age", "black", "south", "urban")
+filtered_wage <- as.data.frame(filtered_wage)
+
+wage_model <- lm(wage ~ KWW + IQ + age, data = filtered_wage)
+qqnorm(wage_model$residuals)
+qqline(wage_model$residuals)
+shapiro.test(wage_model$residuals)
+
+model_summary <- summary(wage_model)
 
 predicted_data <- predict(wage_model, test_data)
 actuals_preds <- data.frame(cbind(actuals = test_data$wage, predicteds = predicted_data))
@@ -120,6 +140,3 @@ actuals_preds <- data.frame(cbind(actuals = test_data$wage, predicteds = predict
 min_max_accuracy <- mean(apply(actuals_preds, 1, min) / apply(actuals_preds, 1, max))
 
 mape <- mean(abs((actuals_preds$predicteds - actuals_preds$actuals)) / actuals_preds$actuals)
-
-layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page
-plot(fit)
