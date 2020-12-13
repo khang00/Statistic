@@ -124,19 +124,24 @@ filtered_wage <- wage_data %>%
   discard(function(row) { row[3] < kkw_outlier_index })
 
 filtered_wage <- t(as.data.frame(filtered_wage))
-colnames(filtered_wage) <- c("wage", "IQ", "KWW", "age", "black", "south", "urban")
 filtered_wage <- as.data.frame(filtered_wage)
+colnames(filtered_wage) <- c("wage", "IQ", "KWW", "age", "black", "south", "urban")
+rownames(filtered_wage) <- seq(from = 1, to = length(filtered_wage$wage))
 
-wage_model <- lm(wage ~ KWW + IQ + age, data = filtered_wage)
+wage_model <- lm(wage ~ 0 + KWW + IQ + age, data = filtered_wage)
 qqnorm(wage_model$residuals)
 qqline(wage_model$residuals)
 shapiro.test(wage_model$residuals)
-
+boxplot(wage_model$residuals)
 model_summary <- summary(wage_model)
 
-predicted_data <- predict(wage_model, test_data)
-actuals_preds <- data.frame(cbind(actuals = test_data$wage, predicteds = predicted_data))
-
+predicted_data <- predict(wage_model, wage_data)
+actuals_preds <- data.frame(cbind(actuals = wage_data$wage, predicteds = predicted_data))
 min_max_accuracy <- mean(apply(actuals_preds, 1, min) / apply(actuals_preds, 1, max))
 
 mape <- mean(abs((actuals_preds$predicteds - actuals_preds$actuals)) / actuals_preds$actuals)
+
+layout(matrix(c(1, 2, 3, 4), 2, 2)) # optional 4 graphs/page
+plot(wage_model)
+boxplot((wage_data$wage - predicted_data), plot = FALSE)$out
+wage_model$coefficients
