@@ -111,24 +111,31 @@ library(purrr)
 training_data <- head(wage_data, round(0.8 * length(wage_data$wage)))
 test_data <- tail(wage_data, length(wage_data) - round(0.8 * length(wage_data$wage)))
 
-wage_outlier_index <- min(boxplot(wage_data$wage, plot = FALSE)$out)
-iq_outliers <- boxplot(wage_data$IQ, plot = FALSE)$out
-kkw_outlier_index <- max(boxplot(wage_data$KWW, plot = FALSE)$out)
+discard_outliers <- function(wage_data) {
+  wage_outlier <- boxplot(wage_data$wage, plot = FALSE)$out
+  iq_outliers <- boxplot(wage_data$IQ, plot = FALSE)$out
+  kkw_outlier <- boxplot(wage_data$KWW, plot = FALSE)$out
 
-filtered_wage <- wage_data %>%
-  pmap(function(wage, IQ, KWW, age, black, south, urban) {
-    c(wage, IQ, KWW, age, black, south, urban)
-  }) %>%
-  discard(function(row) { row[1] > wage_outlier_index }) %>%
-  discard(function(row) { has_element(iq_outliers, row[2]) }) %>%
-  discard(function(row) { row[3] < kkw_outlier_index })
+  filtered_wage <- wage_data %>%
+    pmap(function(wage, IQ, KWW, age, black, south, urban) {
+      c(wage, IQ, KWW, age, black, south, urban)
+    }) %>%
+    discard(function(row) { has_element(wage_outlier, row[1]) }) %>%
+    discard(function(row) { has_element(iq_outliers, row[2]) }) %>%
+    discard(function(row) { has_element(kkw_outlier, row[3]) })
 
-filtered_wage <- t(as.data.frame(filtered_wage))
-filtered_wage <- as.data.frame(filtered_wage)
-colnames(filtered_wage) <- c("wage", "IQ", "KWW", "age", "black", "south", "urban")
-rownames(filtered_wage) <- seq(from = 1, to = length(filtered_wage$wage))
+  filtered_wage <- t(as.data.frame(filtered_wage))
+  filtered_wage <- as.data.frame(filtered_wage)
+  colnames(filtered_wage) <- c("wage", "IQ", "KWW", "age", "black", "south", "urban")
+  rownames(filtered_wage) <- seq(from = 1, to = length(filtered_wage$wage))
+  filtered_wage
+}
+filtered_wage <- discard_outliers(wage_data)
+filtered_wage <- discard_outliers(filtered_wage)
+filtered_wage <- discard_outliers(filtered_wage)
+filtered_wage <- discard_outliers(filtered_wage)
 
-wage_model <- lm(wage ~ 0 + KWW + IQ + age, data = filtered_wage)
+wage_model <- lm(wage ~ KWW + IQ + age, data = filtered_wage)
 qqnorm(wage_model$residuals)
 qqline(wage_model$residuals)
 shapiro.test(wage_model$residuals)
@@ -145,3 +152,14 @@ layout(matrix(c(1, 2, 3, 4), 2, 2)) # optional 4 graphs/page
 plot(wage_model)
 boxplot((wage_data$wage - predicted_data), plot = FALSE)$out
 wage_model$coefficients
+plot(residuals(wage_model))
+acf(residuals(wage_model))
+plot(fitted(wage_model), residuals(wage_model))
+plot(filtered_wage$wage, residuals(wage_model))
+plot(filtered_wage$wage, fitted(wage_model))
+abline(wage_model)
+mean(residuals(wage_model))
+
+cor.test(residuals(wage_model), filtered_wage$IQ)
+cor.test(residuals(wage_model), filtered_wage$KWW)
+cor.test(residuals(wage_model), filtered_wage$age)
