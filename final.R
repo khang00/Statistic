@@ -130,6 +130,7 @@ discard_outliers <- function(wage_data) {
   rownames(filtered_wage) <- seq(from = 1, to = length(filtered_wage$wage))
   filtered_wage
 }
+
 filtered_wage <- discard_outliers(wage_data)
 filtered_wage <- discard_outliers(filtered_wage)
 filtered_wage <- discard_outliers(filtered_wage)
@@ -152,10 +153,18 @@ layout(matrix(c(1, 2, 3, 4), 2, 2)) # optional 4 graphs/page
 plot(wage_model)
 boxplot((wage_data$wage - predicted_data), plot = FALSE)$out
 wage_model$coefficients
-plot(residuals(wage_model))
 acf(residuals(wage_model))
-plot(fitted(wage_model), residuals(wage_model))
-plot(filtered_wage$wage, residuals(wage_model))
+plot(residuals(wage_model), main = "Residuals Plot",
+     ylab = "Residuals")
+
+plot(fitted(wage_model), residuals(wage_model), , main = "Residuals vs Fitteds Plot",
+     ylab = "Residuals",
+     xlab = "Fitteds")
+
+plot(filtered_wage$wage, residuals(wage_model), main = "Residuals vs Wage Plot",
+     ylab = "Wage",
+     xlab = "Residual")
+
 plot(filtered_wage$wage, fitted(wage_model))
 abline(wage_model)
 mean(residuals(wage_model))
